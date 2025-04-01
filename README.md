@@ -95,14 +95,23 @@ All data is **synthetic** and designed for the **US market**. The app uses three
 - Matched vs Unmatched statistics
 - Filters by date, customer, status
 - Top issues breakdown
+- Interactive data visualization
 
 **Transaction Detail**
 - Matching logic per transaction
 - Flags and error type
 - Decision trace showing step-by-step reconciliation reasoning
+- Animated transitions between states
 
 **Q&A Panel**
 - Conversational interface for querying reconciliation results
+- Natural language processing for complex queries
+- Contextual suggestions based on current data
+
+**Guided Experience**
+- Interactive onboarding tour
+- Contextual help tooltips
+- Progressive feature introduction
 
 ---
 
@@ -130,6 +139,49 @@ npm run dev
 Visit: http://localhost:5173
 
 ---
+
+## 🔄 Simulated Data Service
+
+The application now includes a robust simulated data service that provides realistic financial data for demonstration purposes:
+
+- **Dynamic Data Generation**: Creates varied invoices, payments, and ledger entries with realistic patterns
+- **Consistent Data Sets**: Ensures data consistency across different API calls
+- **Network Simulation**: Includes simulated network delays for realistic API behavior
+- **Edge Cases**: Automatically generates common reconciliation challenges like partial payments and mismatched references
+
+### Extending for Real API Integration
+
+The simulated data service is designed with future API integration in mind:
+
+```typescript
+// Current simulated API call
+const invoices = await getSimulatedInvoices();
+
+// Future real API integration (same interface)
+const invoices = await getInvoices(); // Real API call with identical return type
+```
+
+This architecture allows for seamless switching between simulated and real data sources without changing component code.
+
+## 🎨 UI Improvements
+
+### Enhanced Welcome Modal
+
+The welcome modal has been upgraded to provide:
+
+- **AI Capability Showcase**: Detailed explanation of the AI-powered features
+- **Benefits Visualization**: Clear presentation of key reconciliation benefits
+- **Assistant Preview**: Examples of natural language queries the system can handle
+- **Personalized Experience**: User preference saving for returning visitors
+
+### Guided Tour
+
+A new guided tour feature helps users navigate the application:
+
+- **Interactive Walkthrough**: Step-by-step introduction to key features
+- **Contextual Help**: Tooltips explaining complex reconciliation concepts
+- **Progressive Disclosure**: Introduces features in a logical sequence
+- **Skip & Resume**: Options to skip or resume the tour at any time
 
 ## 🛠️ Future Enhancements
 

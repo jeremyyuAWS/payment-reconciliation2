@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Filter, ReconciliationResult, ReconciliationSummary, ReconciliationRules } from '../types';
 import { reconcilePayments, generateReconciliationSummary, filterReconciliationResults } from '../utils/reconciliationEngine';
-import { invoices, payments, ledgerEntries } from '../data/sampleData';
+import { getSimulatedInvoices, getSimulatedPayments, getSimulatedLedgerEntries } from '../services/simulatedData';
 import { 
   PieChart, InfoIcon, Filter as FilterIcon, Search, Upload, 
   Download, Brain, Settings, FolderUp, Link2, BarChart2 
@@ -72,13 +72,49 @@ const ReconciliationDashboard: React.FC<ReconciliationDashboardProps> = ({ onRes
   
   // Initial data state
   const [appData, setAppData] = useState({
-    invoices: invoices,
-    payments: payments,
-    ledgerEntries: ledgerEntries
+    invoices: [],
+    payments: [],
+    ledgerEntries: []
   });
+  
+  // Error state
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch simulated data
+  useEffect(() => {
+    const fetchSimulatedData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch all data in parallel
+        const [invoicesData, paymentsData, ledgerEntriesData] = await Promise.all([
+          getSimulatedInvoices(),
+          getSimulatedPayments(),
+          getSimulatedLedgerEntries()
+        ]);
+        
+        setAppData({
+          invoices: invoicesData,
+          payments: paymentsData,
+          ledgerEntries: ledgerEntriesData
+        });
+      } catch (err) {
+        console.error('Error fetching simulated data:', err);
+        setError('Failed to load simulated data. Please try again later.');
+      }
+    };
+    
+    fetchSimulatedData();
+  }, []);
+  
+  // Process data for reconciliation
   useEffect(() => {
     const processData = async () => {
+      if (appData.invoices.length === 0 || appData.payments.length === 0) {
+        return; // Don't process if data isn't loaded yet
+      }
+      
       setIsLoading(true);
       
       try {
@@ -102,6 +138,7 @@ const ReconciliationDashboard: React.FC<ReconciliationDashboardProps> = ({ onRes
         setSummary(summaryData);
       } catch (error) {
         console.error('Error processing data:', error);
+        setError('Error processing reconciliation data. Please try again.');
       } finally {
         setIsLoading(false);
         
@@ -294,7 +331,21 @@ const ReconciliationDashboard: React.FC<ReconciliationDashboardProps> = ({ onRes
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-        {isLoading ? (
+        {error ? (
+          <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow">
+            <InfoIcon className="h-10 w-10 text-red-500 mb-4" />
+            <h2 className="text-xl font-medium text-gray-700 mb-2">Error Loading Data</h2>
+            <p className="text-gray-500 text-center max-w-md mb-4">
+              {error}
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <Brain className="h-10 w-10 text-indigo-500 animate-pulse" />
